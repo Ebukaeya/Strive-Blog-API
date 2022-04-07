@@ -58,7 +58,8 @@ authorsRouter.get("/:authorID", (req, res) => {
 authorsRouter.post("/", (req, res) => {
   let newAuthor = {...req.body, createdAt:new Date(), ID: uniqid()};
   writeAuthors(newAuthor)
-  res.send(newAuthor.ID);
+  /* res.send(newAuthor.ID); */
+  throw new Error
 });
 
 export default authorsRouter;
