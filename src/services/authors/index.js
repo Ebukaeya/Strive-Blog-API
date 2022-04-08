@@ -1,8 +1,11 @@
 import express from "express";
 import uniqid from "uniqid";
 import { dirname, join } from "path";
-import fs from "fs";
+import fs from "fs-extra";
 import { fileURLToPath } from "url";
+import { validatePicture } from "../../validators/validatePhoto.js";
+import multer from "multer"
+const upload = multer(/* { dest: join(process.cwd(), "./src/files") } */)
 
 const authorsRouter = express.Router();
 
@@ -21,25 +24,6 @@ let writeAuthors = (newauthor) => {
 
   fs.writeFileSync(authorPath, JSON.stringify(authors));
 };
-/* writeAuthors({
-    name: "Ebukaa",
-    surname:"Eya6",
-    ID: uniqid(),
-    email: "eyaebuka@gmailbb.com",
-    dob:"22-11-92",
-    avarter: ""
-})
-
- */
-
-/* writeAuthors(...readAuthors(),{
-    name: "Ebuka1",
-    surname:"Eya4",
-    ID: uniqid(),
-    email: "eyaebuka@gmailbb.com",
-    dob:"22-11-92",
-    avarter: ""
-}) */
 
 authorsRouter.get("/", (req, res) => {
   let authors = readAuthors();
@@ -55,11 +39,13 @@ authorsRouter.get("/:authorID", (req, res) => {
   res.send(author);
 });
 
-authorsRouter.post("/", (req, res) => {
-  let newAuthor = {...req.body, createdAt:new Date(), ID: uniqid()};
-  writeAuthors(newAuthor)
-  /* res.send(newAuthor.ID); */
-  throw new Error
+authorsRouter.post("/", /* validatePicture, */ upload.single("avatar"), (req, res) => {
+  console.log("route enter");
+  console.log(req.file.buffer);
+  let newAuthor = { ...req.body, createdAt: new Date(), ID: uniqid() };
+  writeAuthors(newAuthor);
+  res.send(newAuthor.ID);
+  
 });
 
 export default authorsRouter;
