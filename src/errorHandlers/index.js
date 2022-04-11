@@ -2,7 +2,7 @@
 
 
 export const pictureValidationError = (err,req,res,next)=>{
-    console.log("i was reached");
+    console.log("i was reached", err.status);
     if (err.status===400){
         res.status(400).send(err.message)
     }

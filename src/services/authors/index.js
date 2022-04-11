@@ -6,6 +6,13 @@ import { fileURLToPath } from "url";
 import { validatePicture } from "../../validators/validatePhoto.js";
 import multer from "multer"
 const upload = multer(/* { dest: join(process.cwd(), "./src/files") } */)
+/* const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary'); */
+
+
+
+
+console.log(process.env.PORT);
 
 const authorsRouter = express.Router();
 
@@ -20,14 +27,11 @@ let readAuthors = () => {
 let writeAuthors = (newauthor) => {
   let authors = readAuthors();
   authors.push(newauthor);
-  console.log(authors);
-
   fs.writeFileSync(authorPath, JSON.stringify(authors));
 };
 
 authorsRouter.get("/", (req, res) => {
   let authors = readAuthors();
-  console.log(authors);
 
   res.send(authors);
 });
