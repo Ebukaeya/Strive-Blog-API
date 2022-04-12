@@ -8,6 +8,9 @@ import multer from "multer"
 const upload = multer(/* { dest: join(process.cwd(), "./src/files") } */)
 /* const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary'); */
+import { readStream } from "../../fs-tools/index.js";
+import{pipeline} from "stream"
+/* onsole.log(readStream()); */
 
 
 
@@ -51,5 +54,18 @@ authorsRouter.post("/", /* validatePicture, */ upload.single("avatar"), (req, re
   res.send(newAuthor.ID);
   
 });
+
+authorsRouter.get("/download", (req,res)=>{
+
+ const source = readStream
+const destination = res 
+
+ pipeline(source,destination, err =>{
+   if(err) console.log(err);
+   else console.log("stream ended");
+ }) 
+
+
+})
 
 export default authorsRouter;
