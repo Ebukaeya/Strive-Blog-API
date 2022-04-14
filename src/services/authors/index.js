@@ -4,16 +4,13 @@ import { dirname, join } from "path";
 import fs from "fs-extra";
 import { fileURLToPath } from "url";
 import { validatePicture } from "../../validators/validatePhoto.js";
-import multer from "multer"
-const upload = multer(/* { dest: join(process.cwd(), "./src/files") } */)
+import multer from "multer";
+const upload = multer(/* { dest: join(process.cwd(), "./src/files") } */);
 /* const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary'); */
 import { readStream } from "../../fs-tools/index.js";
-import{pipeline} from "stream"
-/* onsole.log(readStream()); */
-
-
-
+import { pipeline } from "stream";
+console.log(readStream());
 
 console.log(process.env.PORT);
 
@@ -39,6 +36,20 @@ authorsRouter.get("/", (req, res) => {
   res.send(authors);
 });
 
+authorsRouter.get("/download", (req, res) => {
+  res.setHeader("Content-Disposition", "attachment; filename=whatever.json.gz");
+  const source = readStream();
+  const destination = res;
+
+  pipeline(source, destination, (err) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("stream ended");
+    }
+  });
+});
+
 authorsRouter.get("/:authorID", (req, res) => {
   let author = readAuthors().find(
     (author) => author.ID === req.params.authorID
@@ -46,26 +57,16 @@ authorsRouter.get("/:authorID", (req, res) => {
   res.send(author);
 });
 
-authorsRouter.post("/", /* validatePicture, */ upload.single("avatar"), (req, res) => {
-  console.log("route enter");
-  console.log(req.file.buffer);
-  let newAuthor = { ...req.body, createdAt: new Date(), ID: uniqid() };
-  writeAuthors(newAuthor);
-  res.send(newAuthor.ID);
-  
-});
-
-authorsRouter.get("/download", (req,res)=>{
-
- const source = readStream
-const destination = res 
-
- pipeline(source,destination, err =>{
-   if(err) console.log(err);
-   else console.log("stream ended");
- }) 
-
-
-})
+authorsRouter.post(
+  "/",
+  /* validatePicture, */ upload.single("avatar"),
+  (req, res) => {
+    console.log("route enter");
+    console.log(req.file.buffer);
+    let newAuthor = { ...req.body, createdAt: new Date(), ID: uniqid() };
+    writeAuthors(newAuthor);
+    res.send(newAuthor.ID);
+  }
+);
 
 export default authorsRouter;
